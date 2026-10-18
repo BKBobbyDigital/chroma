@@ -1,0 +1,212 @@
+:root {
+  --bg: #030305;
+  --panel: rgba(9, 10, 13, 0.96);
+  --edge: rgba(255, 106, 42, 0.35);
+  --text: #ece6df;
+  --muted: #8a817a;
+  --goo: #ff5a1a;
+  --goo-hot: #ff8f3d;
+  --amber: #ffb020;
+  --red: #ff3b30;
+  --sans: "Chakra Petch", ui-sans-serif, system-ui, sans-serif;
+  --mono: "Share Tech Mono", ui-monospace, monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  min-height: 100%;
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+  background: var(--bg);
+  color: var(--text);
+  font: 15px/1.5 var(--sans);
+}
+
+#city {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+}
+
+main {
+  position: relative;
+  z-index: 1;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.stage {
+  position: relative;
+  /* as wide as fits, but never taller than the screen; --ar is set by the game per layout */
+  width: min(100%, calc((100vh - 90px) * var(--ar, 1.37)));
+  width: min(100%, calc((100dvh - 90px) * var(--ar, 1.37)));
+  margin: 0 auto;
+  aspect-ratio: 1000 / 730;
+}
+
+#game {
+  display: block;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  width: 100%;
+  height: 100%;
+  touch-action: manipulation;
+  cursor: pointer;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(2, 2, 4, 0.55);
+  padding: 16px;
+}
+.overlay.hidden { display: none; }
+
+.panel {
+  position: relative;
+  width: min(560px, 100%);
+  max-height: 100%;
+  overflow: auto;
+  background: var(--panel);
+  padding: 26px 30px;
+  clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px));
+  box-shadow: inset 0 0 0 1px var(--edge);
+}
+.panel::before {
+  content: "";
+  position: absolute;
+  left: 30px;
+  top: 0;
+  width: 40px;
+  height: 2px;
+  background: var(--goo);
+  box-shadow: 0 0 10px var(--goo);
+}
+
+.panel h1, .panel h2 {
+  font-family: var(--sans);
+  font-weight: 700;
+  color: var(--goo);
+  text-shadow: 0 0 14px rgba(255, 90, 26, 0.55);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin: 0 0 10px;
+  line-height: 1.15;
+}
+.panel h1 { font-size: 40px; letter-spacing: 8px; }
+.panel h2 { font-size: 24px; }
+.panel h2.fail { color: var(--red); text-shadow: 0 0 14px rgba(255, 59, 48, 0.5); }
+.panel p { margin: 8px 0; }
+.panel .tag {
+  font-family: var(--mono);
+  color: var(--muted);
+  font-size: 13px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin: -4px 0 16px;
+}
+.panel .tag span { color: #c4532a; margin-left: 10px; letter-spacing: 4px; }
+.panel ul { padding-left: 18px; margin: 10px 0 16px; color: var(--muted); }
+.panel li { margin: 5px 0; }
+.panel li::marker { color: var(--goo); }
+.panel b { color: var(--text); font-weight: 600; }
+.panel code {
+  font-family: var(--mono);
+  color: var(--goo-hot);
+  font-size: 20px;
+  letter-spacing: 3px;
+  text-shadow: 0 0 10px rgba(255, 90, 26, 0.5);
+}
+.panel table { width: 100%; border-collapse: collapse; margin: 8px 0 16px; font-size: 14px; }
+.panel td { padding: 4px 0; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+.panel td:last-child { text-align: right; font-family: var(--mono); font-size: 15px; color: var(--text); letter-spacing: 0; }
+.panel tr.total td { border-top: 1px solid var(--edge); padding-top: 8px; color: var(--goo); }
+.panel .row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+.panel .muted { color: var(--muted); font-size: 13px; }
+
+button {
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 11px 18px;
+  background: #121317;
+  color: var(--text);
+  border: 1px solid #34302d;
+  cursor: pointer;
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+}
+button:hover, button:focus-visible { border-color: var(--goo); color: var(--goo-hot); outline: none; }
+button.primary { background: var(--goo); color: #120601; border-color: var(--goo); }
+button.primary:hover, button.primary:focus-visible { background: var(--goo-hot); color: #120601; box-shadow: 0 0 18px rgba(255, 90, 26, 0.6); }
+
+input {
+  font-family: var(--mono);
+  font-size: 15px;
+  letter-spacing: 3px;
+  padding: 10px 12px;
+  width: 170px;
+  background: #050506;
+  color: var(--goo-hot);
+  border: 1px solid #34302d;
+  text-transform: uppercase;
+}
+input:focus { border-color: var(--goo); outline: none; }
+
+.controls {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+.controls button { background: rgba(9, 10, 13, 0.85); }
+
+/* Phones */
+@media (max-width: 600px) {
+  main {
+    padding: max(6px, env(safe-area-inset-top)) max(6px, env(safe-area-inset-right)) max(6px, env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-left));
+  }
+  .stage {
+    width: min(100%, calc((100vh - 64px) * var(--ar, 0.5)));
+    width: min(100%, calc((100dvh - 64px) * var(--ar, 0.5)));
+  }
+  .controls { gap: 6px; margin-top: 8px; }
+  .controls button { flex: 1; font-size: 11px; letter-spacing: 1px; padding: 12px 6px; }
+  .panel { padding: 20px 18px; }
+  .panel h1 { font-size: 32px; letter-spacing: 6px; }
+  .panel h2 { font-size: 20px; }
+  .panel ul { font-size: 14px; }
+  .panel .row { flex-wrap: wrap; }
+  .panel .row input { flex: 1; min-width: 0; }
+  button { padding: 12px 14px; }
+}
+
+/* Phones held sideways: put the buttons beside the game so it can use the full height */
+@media (max-height: 520px) and (orientation: landscape) {
+  main {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    max-width: none;
+    padding: max(6px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(6px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+  }
+  .stage {
+    margin: 0;
+    width: min(calc(100% - 130px), calc((100vh - 12px) * var(--ar, 1.37)));
+    width: min(calc(100% - 130px), calc((100dvh - 12px) * var(--ar, 1.37)));
+  }
+  .controls { flex-direction: column; margin: 0; width: 120px; }
+  .controls button { font-size: 11px; letter-spacing: 1px; padding: 12px 8px; }
+}

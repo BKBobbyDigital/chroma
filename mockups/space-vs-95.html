@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Space Directions</title>
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=Inter:wght@400;600&family=Orbitron:wght@500;800&family=Barlow+Condensed:wght@500;700&family=IBM+Plex+Mono:wght@500&family=Space+Mono&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #1b1d22; color: #e6e6e6; font: 15px/1.5 Inter, system-ui, sans-serif; }
+  main { max-width: 1240px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { font-size: 22px; font-weight: 600; margin: 0 0 4px; }
+  .sub { color: #9aa0a8; margin: 0 0 24px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(560px, 1fr)); gap: 28px; }
+  .opt h2 { font-size: 17px; font-weight: 600; margin: 12px 0 2px; }
+  .opt p { margin: 0; color: #9aa0a8; font-size: 14px; }
+  .stage { height: 420px; border-radius: 10px; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative; }
+  .board { display: grid; grid-template-columns: repeat(7, 44px); grid-template-rows: repeat(4, 44px); }
+  .board svg, .disp svg { width: 44px; height: 44px; display: block; }
+  .disp { display: grid; grid-template-rows: repeat(4, 48px); place-items: center; width: 52px; flex: none; }
+  @media (max-width: 620px) { .grid { grid-template-columns: 1fr; } .stage { transform: scale(.75); } }
+
+  /* Windows 95 */
+  .w95 { background: #008080; font-family: Tahoma, "MS Sans Serif", Geneva, sans-serif; font-size: 12px; color: #000; }
+  .w95 .win { background: #c0c0c0; border: 2px solid; border-color: #fff #000 #000 #fff; box-shadow: inset -1px -1px #808080, inset 1px 1px #dfdfdf; padding: 3px; }
+  .w95 .title { background: linear-gradient(90deg, #000080, #1084d0); color: #fff; font-weight: bold; padding: 3px 4px; display: flex; justify-content: space-between; align-items: center; }
+  .w95 .tb { display: flex; gap: 2px; }
+  .w95 .tb span { width: 16px; height: 14px; background: #c0c0c0; border: 1px solid; border-color: #fff #000 #000 #fff; color: #000; font-size: 10px; line-height: 12px; text-align: center; }
+  .w95 .menu { padding: 3px 4px; display: flex; gap: 14px; }
+  .w95 .menu u { text-decoration: underline; }
+  .w95 .body { display: flex; gap: 8px; padding: 6px; }
+  .w95 .sunk { border: 2px solid; border-color: #808080 #fff #fff #808080; background: #9c9c9c; }
+  .w95 .status { display: flex; gap: 3px; margin-top: 3px; }
+  .w95 .status div { flex: 1; border: 1px solid; border-color: #808080 #fff #fff #808080; padding: 1px 4px; }
+  .w95 .lcd { font-family: VT323, monospace; font-size: 22px; background: #000; color: #f00; padding: 0 6px; border: 2px solid; border-color: #808080 #fff #fff #808080; }
+  .w95 .prog { height: 14px; display: flex; gap: 2px; padding: 2px; }
+  .w95 .prog i { width: 8px; background: #000080; }
+
+  /* Space */
+  .space {
+    background:
+      radial-gradient(ellipse at 85% 110%, rgba(255,120,60,.35), transparent 45%),
+      radial-gradient(ellipse at 10% -10%, rgba(90,60,200,.45), transparent 50%),
+      #05060f;
+    font-family: Orbitron, sans-serif; color: #bfeaff;
+  }
+  .space .stars, .space .stars2 { position: absolute; inset: 0; background-repeat: repeat; pointer-events: none; }
+  .space .stars { background-image: radial-gradient(1px 1px at 20px 30px, #fff, transparent), radial-gradient(1px 1px at 90px 80px, #cde, transparent), radial-gradient(1.5px 1.5px at 150px 20px, #fff, transparent), radial-gradient(1px 1px at 60px 140px, #9cf, transparent), radial-gradient(1px 1px at 170px 120px, #fff, transparent); background-size: 200px 160px; opacity: .8; }
+  .space .stars2 { background-image: radial-gradient(1px 1px at 40px 60px, #fff, transparent), radial-gradient(2px 2px at 120px 100px, #ffe9c4, transparent); background-size: 260px 220px; opacity: .6; }
+  .space .planet { position: absolute; right: -60px; bottom: -90px; width: 230px; height: 230px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #ffb27a, #c2462a 55%, #3a0f12 80%); box-shadow: 0 0 60px rgba(255,120,60,.35); }
+  .space .hull { position: relative; padding: 14px; background: linear-gradient(#1b2236, #0f1424); clip-path: polygon(18px 0, calc(100% - 18px) 0, 100% 18px, 100% calc(100% - 18px), calc(100% - 18px) 100%, 18px 100%, 0 calc(100% - 18px), 0 18px); }
+  .space .hull::before { content: ""; position: absolute; inset: 0; border: 1px solid rgba(77,226,255,.45); clip-path: inherit; pointer-events: none; }
+  .space .hud { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 10px; letter-spacing: 2px; color: #7fb6d6; }
+  .space .hud b { font-weight: 800; font-size: 18px; color: #e9faff; letter-spacing: 3px; text-shadow: 0 0 10px rgba(77,226,255,.6); }
+  .space .alert { color: #ff8a5c; text-shadow: 0 0 8px rgba(255,120,60,.7); }
+  .space .row { display: flex; gap: 12px; }
+  .space .bay { background: rgba(77,226,255,.06); border: 1px solid rgba(77,226,255,.3); border-radius: 4px; }
+  .space .label { font-size: 8px; letter-spacing: 2px; color: #7fb6d6; text-align: center; margin-top: 4px; }
+  .space .bar { height: 6px; margin-top: 10px; background: rgba(255,255,255,.08); border-radius: 3px; overflow: hidden; }
+  .space .bar i { display: block; width: 38%; height: 100%; background: linear-gradient(90deg, #ff5c3a, #ffb35c); box-shadow: 0 0 10px #ff7a3a; }
+
+  /* Shuttle */
+  .shuttle { background: #0b0d12; font-family: "Barlow Condensed", sans-serif; color: #1a1a1a; }
+  .shuttle .earth { position: absolute; left: -10%; right: -10%; bottom: -330px; height: 420px; border-radius: 50%; background: radial-gradient(ellipse at 50% 0%, #6fb6ff 0, #2a6fc9 18%, #0f2f66 40%, transparent 62%); box-shadow: 0 -6px 30px rgba(111,182,255,.45); }
+  .shuttle .craft { position: relative; background: #f4f3ee; border-radius: 6px; padding: 12px 14px 0; box-shadow: 0 12px 30px rgba(0,0,0,.5); overflow: hidden; }
+  .shuttle .top { display: flex; align-items: stretch; gap: 10px; margin-bottom: 10px; }
+  .shuttle .tag { background: #ff4f00; color: #fff; font-weight: 700; font-size: 13px; letter-spacing: 2px; padding: 2px 10px; display: flex; align-items: center; }
+  .shuttle .read { border: 2px solid #1a1a1a; padding: 0 8px; display: flex; flex-direction: column; justify-content: center; line-height: 1.05; }
+  .shuttle .read small { font-size: 10px; letter-spacing: 2px; color: #6b6b66; font-weight: 500; }
+  .shuttle .read b { font-family: "IBM Plex Mono", monospace; font-size: 18px; font-weight: 500; }
+  .shuttle .t { margin-left: auto; background: #1a1a1a; color: #ff7a33; }
+  .shuttle .t small { color: #9a9a94; }
+  .shuttle .row { display: flex; gap: 10px; }
+  .shuttle .well { border: 2px solid #1a1a1a; background: #e9e8e2; }
+  .shuttle .lbl { font-size: 11px; letter-spacing: 2px; font-weight: 700; margin-top: 4px; text-align: center; }
+  .shuttle .belly { margin: 12px -14px 0; height: 26px; background-color: #17181b; background-image: linear-gradient(#2a2c31 1px, transparent 1px), linear-gradient(90deg, #2a2c31 1px, transparent 1px); background-size: 14px 13px; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; color: #f4f3ee; font-size: 11px; letter-spacing: 3px; }
+  .shuttle .belly i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #ff4f00; margin-right: 6px; box-shadow: 0 0 6px #ff4f00; }
+  .shuttle .stripe { position: absolute; left: 0; right: 0; top: 0; height: 4px; background: repeating-linear-gradient(90deg, #1a1a1a 0 18px, #f4f3ee 18px 24px); opacity: .9; }
+
+  /* Teenage Engineering-ish */
+  .te { background: #e4e2dc; font-family: Inter, sans-serif; }
+  .te .dev { background: linear-gradient(#d6d6d2, #c9c9c4); border-radius: 14px; padding: 14px 16px 16px; box-shadow: inset 0 1px 0 #f4f4f1, inset 0 -2px 0 #a9a9a3, 0 18px 30px rgba(0,0,0,.18), 0 2px 4px rgba(0,0,0,.15); width: 470px; }
+  .te .head { display: flex; justify-content: space-between; align-items: baseline; font-size: 11px; color: #3a3a38; margin-bottom: 10px; }
+  .te .head b { font-weight: 600; letter-spacing: .5px; }
+  .te .head span { font-family: "Space Mono", monospace; font-size: 10px; color: #6d6d68; }
+  .te .main { display: flex; gap: 14px; align-items: flex-start; }
+  .te .screen { background: #050505; border-radius: 6px; padding: 8px; box-shadow: inset 0 0 0 2px #2a2a28; }
+  .te .scr-top { display: flex; justify-content: space-between; font-family: "Space Mono", monospace; font-size: 10px; color: #fff; margin-bottom: 6px; }
+  .te .scr-top .o { color: #ff5b1a; }
+  .te .scr-top .b { color: #3d7cff; }
+  .te .knobs { display: grid; grid-template-columns: repeat(2, 38px); gap: 10px 10px; }
+  .te .knob { width: 38px; height: 38px; border-radius: 50%; position: relative; box-shadow: 0 3px 0 rgba(0,0,0,.25), inset 0 2px 0 rgba(255,255,255,.35); }
+  .te .knob::after { content: ""; position: absolute; left: 50%; top: 5px; width: 3px; height: 9px; border-radius: 2px; background: rgba(255,255,255,.85); transform: translateX(-50%); }
+  .te .k1 { background: #3d7cff; } .te .k2 { background: #22b35e; } .te .k3 { background: #f2f2ee; } .te .k3::after { background: #555; } .te .k4 { background: #ff5b1a; }
+  .te .tiny { font-size: 9px; color: #6d6d68; text-align: center; margin-top: 3px; }
+  .te .keys { display: flex; gap: 6px; margin-top: 12px; }
+  .te .key { width: 48px; height: 48px; border-radius: 8px; background: #f1f1ee; box-shadow: inset 0 -3px 0 #c4c4be, 0 1px 2px rgba(0,0,0,.2); display: grid; place-items: center; }
+  .te .key svg { width: 34px; height: 34px; }
+  .te .key.next { background: #ff5b1a; box-shadow: inset 0 -3px 0 #c43e0a, 0 1px 2px rgba(0,0,0,.2); }
+  .te .key.dark { background: #2b2b29; box-shadow: inset 0 -3px 0 #111, 0 1px 2px rgba(0,0,0,.2); color: #f1f1ee; font-size: 10px; font-family: "Space Mono", monospace; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Space directions vs Windows 95</h1>
+  <p class="sub">Same board in each. Static mockups; the real game would animate them.</p>
+  <div class="grid">
+
+    <section class="opt">
+      <div class="stage w95">
+        <div class="win">
+          <div class="title"><span>Goo Line</span><div class="tb"><span>_</span><span>□</span><span>×</span></div></div>
+          <div class="menu"><span><u>G</u>ame</span><span><u>O</u>ptions</span><span><u>H</u>elp</span></div>
+          <div class="body">
+            <div class="sunk disp" data-q="H,SW,V,ES" data-theme="w95"></div>
+            <div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+                <span class="lcd">002450</span><span>Level 3</span><span class="lcd">12</span>
+              </div>
+              <div class="sunk board" data-theme="w95"></div>
+            </div>
+          </div>
+          <div class="status"><div>Pipes: 6 / 15</div><div style="flex:2"><div class="prog"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div></div>
+        </div>
+      </div>
+      <h2>Windows 95</h2>
+      <p>The game as a 1995 desktop program: grey bevelled window, menu bar, red LED counters. Instant nostalgia; the look is all in the window around the board.</p>
+    </section>
+
+    <section class="opt">
+      <div class="stage space">
+        <div class="stars"></div><div class="stars2"></div><div class="planet"></div>
+        <div class="hull">
+          <div class="hud">
+            <span>SECTOR 03</span>
+            <b>002450</b>
+            <span class="alert">CORE BREACH 12</span>
+          </div>
+          <div class="row">
+            <div>
+              <div class="bay disp" data-q="H,SW,V,ES" data-theme="space"></div>
+              <div class="label">CARGO</div>
+            </div>
+            <div class="bay board" data-theme="space"></div>
+          </div>
+          <div class="bar"><i></i></div>
+          <div class="hud" style="margin:8px 0 0"><span>CONDUITS 6 / 15</span><span>REROUTE PLASMA</span></div>
+        </div>
+      </div>
+      <h2>Space</h2>
+      <p>You're rerouting glowing plasma through a damaged ship before the core blows. The countdown becomes a core breach alarm, blocks become asteroids or hull damage, wrap-around edges could be wormholes, and the bonus round could be docking. It's a fresh setting with a built-in story, and every mechanic gets a sci-fi name.</p>
+    </section>
+
+    <section class="opt">
+      <div class="stage shuttle">
+        <div class="earth"></div>
+        <div class="craft">
+          <div class="stripe"></div>
+          <div class="top" style="margin-top:8px">
+            <div class="tag">MISSION 03</div>
+            <div class="read"><small>SCORE</small><b>002450</b></div>
+            <div class="read"><small>FEED LINES</small><b>06/15</b></div>
+            <div class="read t"><small>IGNITION</small><b>T-00:12</b></div>
+          </div>
+          <div class="row">
+            <div><div class="well disp" data-q="H,SW,V,ES" data-theme="shuttle"></div><div class="lbl">NEXT</div></div>
+            <div class="well board" data-theme="shuttle"></div>
+          </div>
+          <div class="belly"><span><i></i>FUEL TRANSFER</span><span>F = IGNITE NOW</span></div>
+        </div>
+      </div>
+      <h2>Shuttle era</h2>
+      <p>Clean white panels, safety orange, black heat-shield tiles and mission-control readouts, like the inside of a 1980s shuttle. You're plumbing fuel lines before ignition, so the countdown is a real launch countdown. Brighter and more grown-up than the neon version, and still nostalgic.</p>
+    </section>
+
+    <section class="opt">
+      <div class="stage te">
+        <div class="dev">
+          <div class="head"><b>goo line</b><span>g-1 · level 03</span></div>
+          <div class="main">
+            <div class="screen">
+              <div class="scr-top"><span>002450</span><span class="b">06/15</span><span class="o">goo 12</span></div>
+              <div class="board" data-theme="te"></div>
+            </div>
+            <div>
+              <div class="knobs">
+                <div><div class="knob k1"></div><div class="tiny">speed</div></div>
+                <div><div class="knob k2"></div><div class="tiny">level</div></div>
+                <div><div class="knob k3"></div><div class="tiny">sound</div></div>
+                <div><div class="knob k4"></div><div class="tiny">flood</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="keys" data-te-keys="ES,V,SW,H"></div>
+        </div>
+      </div>
+      <h2>Teenage Engineering</h2>
+      <p>The game as a small grey gadget: a black screen with thin white line pipes, four coloured knobs, and the dispenser as a row of chunky keys with the next piece on the orange one. Tiny lowercase labels, lots of empty space, playful but precise. The most "make it my own" of the bunch, since it doesn't look like any other Pipe Mania clone.</p>
+    </section>
+
+  </div>
+</main>
+<script>
+  const PATHS = {
+    H: 'M0 32H64', V: 'M32 0V64', X: 'M0 32H64M32 0V64', S: 'M32 32H64',
+    NE: 'M32 0A32 32 0 0 0 64 32', ES: 'M64 32A32 32 0 0 0 32 64',
+    SW: 'M32 64A32 32 0 0 0 0 32', WN: 'M0 32A32 32 0 0 0 32 0',
+  };
+  const THEMES = {
+    w95:   { tile: ['#c0c0c0', '#b4b4b4'], edge: '#000', shell: '#dfdfdf', ch: '#808080', goo: '#00c000', cap: 'square' },
+    shuttle: { tile: ['#f4f3ee', '#ebeae4'], edge: '#1a1a1a', shell: '#ffffff', ch: '#2b2b2b', goo: '#ff4f00', cap: 'butt', heat: true },
+    te: { tile: ['#050505', '#0b0b0b'], edge: '#f2f2ee', shell: '#050505', ch: '#050505', goo: '#ff5b1a', line: true, thin: true },
+    keycap: { tile: ['transparent', 'transparent'], edge: '#2b2b29', shell: '#f1f1ee', ch: '#f1f1ee', goo: '#ff5b1a', line: true, thin: true },
+    keynext: { tile: ['transparent', 'transparent'], edge: '#fff', shell: '#ff5b1a', ch: '#ff5b1a', goo: '#fff', line: true, thin: true },
+    space: { tile: ['rgba(10,16,32,.9)', 'rgba(16,24,44,.9)'], edge: '#4de2ff', shell: '#2a3550', ch: '#070a14', goo: '#8ff7ff', glow: true },
+  };
+  const LAYOUT = [
+    [0,0,0,0,['ES',0],['H',0],['SW',0]],
+    [['S',1],['H',1],['H',1],['SW',.55],0,'B',['V',0]],
+    [0,['X',0],0,['V',0],0,0,['V',0]],
+    [0,0,0,['NE',0],['H',0],['H',0],['WN',0]],
+  ];
+  function svg(shape, fill, t, x, y) {
+    const d = PATHS[shape];
+    let s = `<svg viewBox="0 0 64 64"><defs><filter id="g${x}${y}" filterUnits="userSpaceOnUse" x="0" y="0" width="64" height="64"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><rect width="64" height="64" fill="${t.tile[(x + y) % 2]}"/>`;
+    if (t.glow) s += `<rect x=".5" y=".5" width="63" height="63" fill="none" stroke="rgba(77,226,255,.08)"/>`;
+    if (shape === 'B' && t.thin) return s + `<g fill='#3d7cff'>${[14,26,38,50].map(a=>[14,26,38,50].map(b=>`<circle cx='${a}' cy='${b}' r='2.5'/>`).join('')).join('')}</g></svg>`;
+    if (shape === 'B' && t.heat) return s + `<rect x='4' y='4' width='56' height='56' fill='#17181b'/><path d='M4 18H60M4 32H60M4 46H60M18 4V60M32 4V60M46 4V60' stroke='#2e3036' stroke-width='1.5'/><rect x='4' y='4' width='56' height='56' fill='none' stroke='#ff4f00' stroke-width='2' stroke-dasharray='5 4'/></svg>`;
+    if (shape === 'B') {
+      if (t.glow) return s + `<path d="M18 22 L30 12 L46 16 L54 30 L48 48 L30 54 L14 44 L10 30Z" fill="#3b3330" stroke="#6b5a50" stroke-width="2"/><circle cx="26" cy="28" r="5" fill="#2a2421"/><circle cx="40" cy="40" r="4" fill="#2a2421"/></svg>`;
+      return s + `<rect x="6" y="6" width="52" height="52" fill="none" stroke="#000" stroke-opacity=".5" stroke-width="3" stroke-dasharray="6 5"/><path d="M6 6L58 58M58 6L6 58" stroke="#000" stroke-opacity=".35" stroke-width="3"/></svg>`;
+    }
+    if (!d) return s + '</svg>';
+    const cap = t.cap || 'butt';
+    if (t.thin) {
+      s += `<path d="${d}" fill="none" stroke="${t.edge}" stroke-width="18"/><path d="${d}" fill="none" stroke="${t.shell}" stroke-width="13"/>`;
+    } else if (t.glow) {
+      s += `<path d="${d}" fill="none" stroke="${t.shell}" stroke-width="24"/><path d="${d}" fill="none" stroke="${t.edge}" stroke-opacity=".55" stroke-width="24" stroke-dasharray="2 6"/><path d="${d}" fill="none" stroke="${t.shell}" stroke-width="20"/><path d="${d}" fill="none" stroke="${t.ch}" stroke-width="15"/>`;
+    } else {
+      s += `<path d="${d}" fill="none" stroke="${t.edge}" stroke-width="30" stroke-linecap="${cap}"/><path d="${d}" fill="none" stroke="${t.shell}" stroke-width="25"/><path d="${d}" fill="none" stroke="${t.ch}" stroke-width="14"/>`;
+    }
+    if (fill > 0) s += `<path d="${d}" pathLength="1" stroke-dasharray="${fill} 2" fill="none" stroke="${t.goo}" stroke-width="${t.thin ? 9 : t.glow ? 13 : 14}" ${t.glow ? `filter="url(#g${x}${y})"` : ''}/>`;
+    if (shape === 'S') {
+      s += t.glow
+        ? `<circle cx="32" cy="32" r="16" fill="#1b2236" stroke="${t.edge}" stroke-width="2"/><circle cx="32" cy="32" r="9" fill="#e9faff" filter="url(#g${x}${y})"/>`
+        : `<circle cx="32" cy="32" r="15" fill="${t.edge}"/><circle cx="32" cy="32" r="9" fill="${t.goo}"/>`;
+    }
+    return s + '</svg>';
+  }
+  for (const el of document.querySelectorAll('.board')) {
+    const t = THEMES[el.dataset.theme];
+    let html = '';
+    LAYOUT.forEach((row, y) => row.forEach((c, x) => {
+      html += c === 'B' ? svg('B', 0, t, x, y) : c ? svg(c[0], c[1], t, x, y) : svg('', 0, t, x, y);
+    }));
+    el.innerHTML = html;
+  }
+  for (const el of document.querySelectorAll('.disp')) {
+    const t = THEMES[el.dataset.theme];
+    el.innerHTML = el.dataset.q.split(',').map((q, i) => svg(q, 0, t, 10 + i, 9)).join('');
+  }
+  for (const el of document.querySelectorAll('[data-te-keys]')) {
+    const qs = el.dataset.teKeys.split(',');
+    el.innerHTML = qs.map((q, i) => `<div class="key ${i === qs.length - 1 ? 'next' : ''}">${svg(q, 0, THEMES[i === qs.length - 1 ? 'keynext' : 'keycap'], 20 + i, 20)}</div>`).join('')
+      + '<div class="key dark">swap</div><div class="key dark">||</div>';
+  }
+</script>
+</body>
+</html>

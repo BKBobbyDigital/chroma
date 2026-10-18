@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UI Directions</title>
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=Inter:wght@400;600&family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #1b1d22; color: #e6e6e6; font: 15px/1.5 Inter, system-ui, sans-serif; }
+  main { max-width: 1240px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { font-size: 22px; font-weight: 600; margin: 0 0 4px; }
+  .sub { color: #9aa0a8; margin: 0 0 24px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(560px, 1fr)); gap: 28px; }
+  .opt h2 { font-size: 17px; font-weight: 600; margin: 12px 0 2px; }
+  .opt p { margin: 0; color: #9aa0a8; font-size: 14px; }
+  .stage { height: 380px; border-radius: 10px; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative; }
+  .board { display: grid; grid-template-columns: repeat(7, 40px); grid-template-rows: repeat(4, 40px); }
+  .board svg, .disp svg { width: 40px; height: 40px; display: block; }
+  .disp { display: grid; grid-template-rows: repeat(4, 44px); place-items: center; width: 48px; flex: none; }
+  @media (max-width: 620px) { .grid { grid-template-columns: 1fr; } .stage { transform: scale(.8); } }
+
+  /* 1 — Windows 95 */
+  .w95 { background: #008080; font-family: Tahoma, "MS Sans Serif", Geneva, sans-serif; font-size: 12px; color: #000; }
+  .w95 .win { background: #c0c0c0; border: 2px solid; border-color: #fff #000 #000 #fff; box-shadow: inset -1px -1px #808080, inset 1px 1px #dfdfdf; padding: 3px; }
+  .w95 .title { background: linear-gradient(90deg, #000080, #1084d0); color: #fff; font-weight: bold; padding: 3px 4px; display: flex; justify-content: space-between; align-items: center; }
+  .w95 .tb { display: flex; gap: 2px; }
+  .w95 .tb span { width: 16px; height: 14px; background: #c0c0c0; border: 1px solid; border-color: #fff #000 #000 #fff; color: #000; font-size: 10px; line-height: 12px; text-align: center; }
+  .w95 .menu { padding: 3px 4px; display: flex; gap: 14px; }
+  .w95 .menu u { text-decoration: underline; }
+  .w95 .body { display: flex; gap: 8px; padding: 6px; }
+  .w95 .sunk { border: 2px solid; border-color: #808080 #fff #fff #808080; background: #9c9c9c; }
+  .w95 .status { display: flex; gap: 3px; margin-top: 3px; }
+  .w95 .status div { flex: 1; border: 1px solid; border-color: #808080 #fff #fff #808080; padding: 1px 4px; }
+  .w95 .lcd { font-family: VT323, monospace; font-size: 22px; background: #000; color: #f00; padding: 0 6px; border: 2px solid; border-color: #808080 #fff #fff #808080; }
+  .w95 .prog { height: 14px; display: flex; gap: 2px; padding: 2px; }
+  .w95 .prog i { width: 8px; background: #000080; }
+
+  /* 2 — Windows XP / Frutiger Aero */
+  .wxp { background: linear-gradient(#4b8fe6 0 55%, #5aa832 55%); font-family: Tahoma, Verdana, sans-serif; font-size: 12px; }
+  .wxp .win { background: #ece9d8; border: 1px solid #0831d9; border-radius: 8px 8px 0 0; overflow: hidden; box-shadow: 2px 3px 10px rgba(0,0,0,.4); }
+  .wxp .title { background: linear-gradient(#0a5fe0, #3c8cf6 8%, #0058e6 40%, #0047d0 88%, #0039b3); color: #fff; font: bold 13px Trebuchet MS, Tahoma, sans-serif; padding: 6px 6px 6px 10px; display: flex; justify-content: space-between; align-items: center; text-shadow: 1px 1px #0a246a; }
+  .wxp .tb { display: flex; gap: 2px; }
+  .wxp .tb span { width: 21px; height: 21px; border-radius: 3px; border: 1px solid #fff; background: linear-gradient(#3c8cf6, #1a5fd8); }
+  .wxp .tb span.x { background: linear-gradient(#e8805f, #c4401c); }
+  .wxp .body { display: flex; gap: 10px; padding: 10px; }
+  .wxp .group { border: 1px solid #d0d0bf; border-radius: 4px; padding: 6px; background: #fff; }
+  .wxp .side { width: 120px; background: linear-gradient(#7ba2e7, #6375d6); border-radius: 4px; padding: 8px; color: #fff; }
+  .wxp .side b { display: block; color: #fff; font-size: 11px; margin-bottom: 4px; }
+  .wxp .side div { background: #d6dff7; color: #215dc6; border-radius: 3px; padding: 6px; margin-bottom: 8px; font-size: 11px; }
+  .wxp .btn { display: inline-block; background: linear-gradient(#fff, #ecebe6 85%, #d6d0c5); border: 1px solid #003c74; border-radius: 3px; padding: 3px 12px; font-size: 11px; color: #000; }
+  .wxp .meter { height: 12px; border: 1px solid #686868; border-radius: 3px; background: #fff; padding: 1px; }
+  .wxp .meter i { display: block; height: 100%; width: 62%; background: repeating-linear-gradient(90deg, #2ed64a 0 8px, transparent 8px 10px); }
+
+  /* 3 — Liquid Glass */
+  .glass { background: radial-gradient(circle at 20% 25%, #ff7ac6 0, transparent 40%), radial-gradient(circle at 80% 30%, #6c7bff 0, transparent 45%), radial-gradient(circle at 60% 85%, #22d3a6 0, transparent 45%), #1a1440; font-family: Inter, -apple-system, sans-serif; color: #fff; }
+  .glass .pane { background: rgba(255,255,255,.12); backdrop-filter: blur(22px) saturate(1.6); -webkit-backdrop-filter: blur(22px) saturate(1.6); border: 1px solid rgba(255,255,255,.35); box-shadow: inset 0 1px 0 rgba(255,255,255,.55), 0 10px 30px rgba(0,0,0,.25); border-radius: 26px; }
+  .glass .hud { position: absolute; top: 18px; left: 50%; transform: translateX(-50%); display: flex; gap: 22px; padding: 8px 22px; border-radius: 999px; font-size: 13px; align-items: center; }
+  .glass .hud b { font-size: 18px; font-weight: 600; }
+  .glass .ring { width: 26px; height: 26px; border-radius: 50%; background: conic-gradient(#fff 0 65%, rgba(255,255,255,.2) 0); -webkit-mask: radial-gradient(circle, transparent 8px, #000 9px); mask: radial-gradient(circle, transparent 8px, #000 9px); }
+  .glass .wrap { display: flex; gap: 14px; margin-top: 40px; align-items: center; }
+  .glass .board { padding: 12px; border-radius: 22px; }
+  .glass .disp { padding: 8px 6px; border-radius: 22px; }
+  .glass .pill { position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%); padding: 8px 20px; border-radius: 999px; font-size: 13px; font-weight: 600; }
+
+  /* 4 — Control room */
+  .ctrl { background: #2c2f2a; background-image: radial-gradient(#3a3e37 1px, transparent 1px); background-size: 6px 6px; font-family: "Press Start 2P", monospace; color: #e8dcb5; }
+  .ctrl .console { background: #c9bf9f; border-radius: 6px; padding: 12px; box-shadow: inset 0 -4px #8e8466, 0 6px 0 #1b1c19; display: flex; gap: 12px; align-items: stretch; }
+  .ctrl .rivet { position: absolute; width: 8px; height: 8px; border-radius: 50%; background: #8e8466; box-shadow: inset 1px 1px #e8e0c4; }
+  .ctrl .crt { background: #0d1a0f; border-radius: 10px; padding: 8px; box-shadow: inset 0 0 18px #000, 0 0 0 4px #4a4637; position: relative; overflow: hidden; }
+  .ctrl .crt::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(0,0,0,.25) 0 1px, transparent 1px 3px); pointer-events: none; }
+  .ctrl .col { display: flex; flex-direction: column; gap: 10px; width: 120px; align-items: center; }
+  .ctrl .gauge { width: 96px; height: 96px; border-radius: 50%; background: #f1ead2; border: 5px solid #4a4637; position: relative; box-shadow: inset 0 2px 6px rgba(0,0,0,.35); }
+  .ctrl .gauge::before { content: ""; position: absolute; inset: 8px; border-radius: 50%; background: conic-gradient(from 225deg, #3d7a2e 0 120deg, #d9a21b 120deg 200deg, #b8341e 200deg 270deg, transparent 0); -webkit-mask: radial-gradient(circle, transparent 30px, #000 31px); mask: radial-gradient(circle, transparent 30px, #000 31px); }
+  .ctrl .needle { position: absolute; left: 50%; top: 50%; width: 3px; height: 36px; background: #1b1c19; transform-origin: 50% 100%; transform: translate(-50%, -100%) rotate(70deg); border-radius: 2px; }
+  .ctrl .label { font-size: 7px; color: #4a4637; text-align: center; }
+  .ctrl .nixie { background: #1b1c19; color: #ff9a3c; text-shadow: 0 0 6px #ff7a1a; font-family: VT323, monospace; font-size: 26px; padding: 0 8px; border-radius: 4px; letter-spacing: 2px; }
+  .ctrl .btn { width: 46px; height: 46px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #ff6b4a, #a3200f); border: 4px solid #4a4637; box-shadow: 0 4px #1b1c19; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Goo Line: four UI directions</h1>
+  <p class="sub">Same board in each, so you're comparing only the look. The real game would animate all of these.</p>
+  <div class="grid">
+
+    <section class="opt">
+      <div class="stage w95">
+        <div class="win">
+          <div class="title"><span>Goo Line</span><div class="tb"><span>_</span><span>□</span><span>×</span></div></div>
+          <div class="menu"><span><u>G</u>ame</span><span><u>O</u>ptions</span><span><u>H</u>elp</span></div>
+          <div class="body">
+            <div class="sunk disp" data-q="H,SW,V,ES"></div>
+            <div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+                <span class="lcd">002450</span><span>Level 3</span><span class="lcd">12</span>
+              </div>
+              <div class="sunk board" data-theme="w95"></div>
+            </div>
+          </div>
+          <div class="status"><div>Pipes: 6 / 15</div><div style="flex:2"><div class="prog"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div></div>
+        </div>
+      </div>
+      <h2>1 · Windows 95</h2>
+      <p>Grey bevelled window, menu bar, Minesweeper-style red LED counters, status bar along the bottom. Feels like 1995 and you'd recognise it instantly, but the board itself stays fairly plain.</p>
+    </section>
+
+    <section class="opt">
+      <div class="stage wxp">
+        <div class="win">
+          <div class="title"><span>Goo Line</span><div class="tb"><span></span><span></span><span class="x"></span></div></div>
+          <div class="body">
+            <div class="side">
+              <div><b>Level 3</b>Lay 15 pipes<br>Score 2,450</div>
+              <div><b>Goo in</b><div class="meter"><i></i></div></div>
+              <span class="btn">Flood now</span>
+            </div>
+            <div class="group disp" data-q="H,SW,V,ES"></div>
+            <div class="group board" data-theme="xp"></div>
+          </div>
+        </div>
+      </div>
+      <h2>2 · Windows XP / Frutiger Aero</h2>
+      <p>Glossy blue title bar, the "Bliss" green-hill backdrop, a blue sidebar like XP's Explorer panel, rounded beige buttons. Warmer and more playful than 95, with a lot of 2003 nostalgia.</p>
+    </section>
+
+    <section class="opt">
+      <div class="stage glass">
+        <div class="pane hud"><span>Level 3</span><b>2,450</b><span>6 / 15</span><span class="ring"></span></div>
+        <div class="wrap">
+          <div class="pane disp" data-q="H,SW,V,ES"></div>
+          <div class="pane board" data-theme="glass"></div>
+        </div>
+        <div class="pane pill">Flood now</div>
+      </div>
+      <h2>3 · Liquid Glass</h2>
+      <p>Frosted floating panels over a colourful blurred background, and glass pipes you can see the goo through. The countdown is a ring. This one suits the idea of liquid best, but it's the least retro.</p>
+    </section>
+
+    <section class="opt">
+      <div class="stage ctrl">
+        <div class="console" style="position:relative">
+          <span class="rivet" style="left:4px;top:4px"></span><span class="rivet" style="right:4px;top:4px"></span>
+          <span class="rivet" style="left:4px;bottom:8px"></span><span class="rivet" style="right:4px;bottom:8px"></span>
+          <div class="col">
+            <div class="gauge"><div class="needle"></div></div>
+            <div class="label">PRESSURE</div>
+            <div class="nixie">12</div>
+            <div class="btn"></div>
+            <div class="label">FLOOD</div>
+          </div>
+          <div class="crt"><div class="board" data-theme="ctrl"></div></div>
+          <div class="col" style="width:64px">
+            <div class="crt"><div class="disp" data-q="H,SW,V,ES" data-theme="ctrl"></div></div>
+            <div class="nixie" style="font-size:18px">2450</div>
+          </div>
+        </div>
+      </div>
+      <h2>4 · Plant control room (another way to go)</h2>
+      <p>The goo is waste in a 1970s treatment plant. The countdown is a pressure gauge creeping into the red, the score is on glowing orange number tubes, and the board is a green-screen monitor set in a beige console. Retro without copying an operating system, and the setting comes with its own story.</p>
+    </section>
+
+  </div>
+</main>
+<script>
+  const PATHS = {
+    H: 'M0 32H64', V: 'M32 0V64', X: 'M0 32H64M32 0V64', S: 'M32 32H64',
+    NE: 'M32 0A32 32 0 0 0 64 32', ES: 'M64 32A32 32 0 0 0 32 64',
+    SW: 'M32 64A32 32 0 0 0 0 32', WN: 'M0 32A32 32 0 0 0 32 0',
+  };
+  const THEMES = {
+    w95:   { tile: ['#c0c0c0', '#b4b4b4'], edge: '#000', shell: '#dfdfdf', ch: '#808080', goo: '#00c000', cap: 'square' },
+    xp:    { tile: ['#f4f7fd', '#e8eefa'], edge: '#3a6ac0', shell: '#c9d9f5', ch: '#1e3a6e', goo: '#5ed12b' },
+    glass: { tile: ['rgba(255,255,255,.05)', 'rgba(255,255,255,.1)'], edge: 'rgba(255,255,255,.55)', shell: 'rgba(255,255,255,.18)', ch: 'rgba(255,255,255,.08)', goo: '#7dff6a' },
+    ctrl:  { tile: ['#0d1a0f', '#10200f'], edge: '#2f6b33', shell: '#0d1a0f', ch: '#0d1a0f', goo: '#7dff6a', line: true },
+  };
+  // [shape, fill 0..1] — a short run from the start with goo partway along
+  const LAYOUT = [
+    [0,0,0,0,['ES',0],['H',0],['SW',0]],
+    [['S',1],['H',1],['H',1],['SW',.55],0,'B',['V',0]],
+    [0,['X',0],0,['V',0],0,0,['V',0]],
+    [0,0,0,['NE',0],['H',0],['H',0],['WN',0]],
+  ];
+  function svg(shape, fill, t, x, y) {
+    const d = PATHS[shape];
+    const bg = t.tile[(x + y) % 2];
+    let s = `<svg viewBox="0 0 64 64"><rect width="64" height="64" fill="${bg}"/>`;
+    if (shape === 'B') return s + `<rect x="6" y="6" width="52" height="52" fill="none" stroke="${t.goo}" stroke-opacity=".5" stroke-width="3" stroke-dasharray="6 5"/><path d="M6 6L58 58M58 6L6 58" stroke="${t.goo}" stroke-opacity=".35" stroke-width="3"/></svg>`;
+    if (!d) return s + '</svg>';
+    const cap = t.cap || 'butt';
+    if (t.line) {
+      s += `<path d="${d}" fill="none" stroke="${t.edge}" stroke-width="22" stroke-linecap="${cap}"/><path d="${d}" fill="none" stroke="${t.shell}" stroke-width="16"/>`;
+    } else {
+      s += `<path d="${d}" fill="none" stroke="${t.edge}" stroke-width="30" stroke-linecap="${cap}"/><path d="${d}" fill="none" stroke="${t.shell}" stroke-width="25"/><path d="${d}" fill="none" stroke="${t.ch}" stroke-width="14"/>`;
+    }
+    if (fill > 0) s += `<path d="${d}" pathLength="1" stroke-dasharray="${fill} 2" fill="none" stroke="${t.goo}" stroke-width="14"/>`;
+    if (shape === 'S') s += `<circle cx="32" cy="32" r="15" fill="${t.edge}"/><circle cx="32" cy="32" r="9" fill="${t.goo}"/>`;
+    return s + '</svg>';
+  }
+  for (const el of document.querySelectorAll('.board')) {
+    const t = THEMES[el.dataset.theme];
+    let html = '';
+    LAYOUT.forEach((row, y) => row.forEach((c, x) => {
+      html += c === 'B' ? svg('B', 0, t, x, y) : c ? svg(c[0], c[1], t, x, y) : svg('', 0, t, x, y);
+    }));
+    el.innerHTML = html;
+  }
+  for (const el of document.querySelectorAll('.disp')) {
+    const theme = el.dataset.theme || el.closest('.stage').classList[1];
+    const t = THEMES[{ w95: 'w95', wxp: 'xp', glass: 'glass', ctrl: 'ctrl' }[theme]];
+    el.innerHTML = el.dataset.q.split(',').map((q, i) => svg(q, 0, t, i, 0)).join('');
+  }
+</script>
+</body>
+</html>
